@@ -2,7 +2,7 @@
 % Please edit documentation in R/json_to_dfr.R
 \name{canton_json_to_dfr}
 \alias{canton_json_to_dfr}
-\title{Transform cantonal results json into tibble}
+\title{Transform a opendata.swiss cantonal results json into a tibble}
 \usage{
 canton_json_to_dfr(votedate = NULL, geolevel = "municipality",
   dataurl = NULL, index = NULL)
@@ -32,6 +32,9 @@ placeholder
 results <- canton_json_to_dfr()
 
 glimpse(results)
+
+# transform the json for a single votedate at counting district level
+canton_json_to_dfr(votedate="2019-09-01",geolevel = "zh_counting_districts")
 
 
 }
