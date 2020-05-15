@@ -12,19 +12,13 @@
 #' @rdname get_swissvotes
 #' @return a tibble containing the results
 #' @examples
-#'  \donttest{
-# results <-get_swissvotes(DB=T, savecitation=F, codebook=F)
+#'
+# results <-get_swissvotes(DB=TRUE, savecitation=FALSE, codebook=FALSE)
 #' 
 #' # See codebook only
-#'  get_swissvotes(codebook=F)
-#'  
+#'  get_swissvotes(codebook=FALSE)
+#'
 #' 
-#'
-#'glimpse(results)
-#'
-#'
-#' }
-#'
 #'
 
 get_swissvotes <- function(DB=T, savecitation=F, codebook=F){
