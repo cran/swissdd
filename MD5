@@ -1,8 +1,8 @@
-67660f3b090abde14052152002e46a92 *DESCRIPTION
+d464fcf2360e074e79b128dded6af8cf *DESCRIPTION
 e2ab1347b4f0e23d0330a8f886d0ba6d *NAMESPACE
 e69b57bb81afa18c75f10c24e84727da *R/get_results.R
 a7c195da33d4604fd7d4c926532648dc *R/get_swissvotes.R
-b289fdc096a4dace7ca85a7bcbe88c4b *R/json_to_dfr.R
+7c3c32e70fc066500b9e19a6fd23f5e0 *R/json_to_dfr.R
 d2ae67c706910bdcc53ef0f360c2f8ce *R/similar_votes.R
 f53bc02f6d8ec15972705fc5c5c39542 *R/votedates.R
 11b62dbfcc0c463f24fb63b56c8e281b *R/zzz.R
