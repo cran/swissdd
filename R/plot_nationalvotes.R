@@ -24,14 +24,14 @@
 #' 
 #' # Plot the most recent national vote
 #' plot_nationalvotes()
-#' 
+#' \donttest{
 #' # Plot a specific national vote at cantonal level
 #' plot_nationalvotes(
 #'     votedate = "2014-02-09",
 #'     vote_id = 5800,
 #'     geolevel = "canton"
 #'     )
-#' 
+#' }
 #' @export
 plot_nationalvotes <- function(votedate = NULL, vote_id = NULL, geolevel = "municipality", measure = "result", 
                                standardize = T, lakes = T, language = "DE", theme = "srf") {
@@ -59,6 +59,9 @@ plot_nationalvotes <- function(votedate = NULL, vote_id = NULL, geolevel = "muni
   if (is.null(vote_id)) vote_id <- unique(vote_data[["id"]])[1]
   vote_data <- vote_data[vote_data[["id"]] == vote_id,]
   if (nrow(vote_data) == 0) stop ("No data found for the specified 'vote_id'")
+  # warning if no results are available yet for the chosen vote id
+  if (all(is.na(vote_data$jaStimmenInProzent))==TRUE) warning ("No results available yet for the specified 'vote_id'")
+  
   
   # Join geo with vote data 
   if (geolevel == "municipality") {
