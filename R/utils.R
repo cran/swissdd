@@ -3,29 +3,55 @@
 #' @noRd
 check_api_call <- function(call_res) {
   
-  if (httr::http_error(call_res)) stop("The API does not respond properly. Do you have an internet connection and an open proxy?")
+  if (httr::http_error(call_res)){
+    
+    message("The API does not respond properly. Do you have an internet connection and an open proxy?")
+    
+    return(invisible(NULL))
+    
+  } else {
+    
+    suppressWarnings(jsonlite::fromJSON(httr::content(call_res, as = "text", encoding = "UTF-8")))
+    
+  }
   
 }
+
+#' @importFrom httr http_error
+#'
+#' @noRd
+check_api_call_geo <- function(call_res) {
+  
+  if (!httr::http_error(call_res)){
+    
+    message("The API does not respond properly. Do you have an internet connection and an open proxy?")
+    
+    return(invisible(NULL))
+    
+  } 
+  
+}
+
 
 #' @noRd
 check_geolevel <- function(geolevel, available_geolevels) {
   
   if (!geolevel %in% available_geolevels) stop("Please select valid 'geolevel'.")
   
-  }
+}
 
 #' @noRd
 check_votedates <- function(votedates, available_votedates) {
   
-  if (sum(!votedates %in% available_votedates) > 0) stop("One or more 'votedates' not found, please call available_votedates() to check which dates are available.")
+  if (sum(!votedates %in% available_votedates) > 0) message("One or more 'votedates' not found, please call available_votedates() to check which dates are available.")
   
 }
 
 #' @noRd
 check_votedate <- function(votedate, available_votedates) {
   
-  if (length(votedate) > 1) stop("This is not a vectorised function. Only one 'votedate' can be queried at a time.")
-  if (!votedate %in% available_votedates) stop("Please select valid 'votedate'.")
+  if (length(votedate) > 1) message("This is not a vectorised function. Only one 'votedate' can be queried at a time.")
+  if (!votedate %in% available_votedates) message("Please select valid 'votedate'.")
   
 }
 
@@ -70,16 +96,14 @@ call_api_base <- function(geolevel = "national") {
 #' @importFrom httr GET http_error
 #'
 #' @noRd
-call_api_geodata <- function() {
+call_api_geodata <- function(){
   
   # Call
   res <- httr::GET("https://opendata.swiss/api/3/action/package_show?id=geodaten-zu-den-eidgenoessischen-abstimmungsvorlagen")
   
-  # Check
-  check_api_call(res)
-  
   # Return
   return(res)
+  
   
 }
 
@@ -96,12 +120,27 @@ get_vote_urls <- function(geolevel = "national", call_res) {
   # Extract content
   cnt <- httr::content(call_res)
   resources <- cnt[["result"]][["resources"]]
+  # get jsons only
+  
+  jsons <- which(unlist(purrr::map(resources, "format")) %in% c("JSON","GeoJSON"))
+  
+  resources <- resources[jsons]
+  
+  # wrap tibble function into possibly - if a tibble cannot be created, an empty one is returned
+  posstibble = purrr::possibly(.f = tibble, otherwise = tibble())
   
   # Extract URLs
-  urls <- tibble::tibble(
+  urls <- posstibble(
     date =  unlist(purrr::map(resources, "coverage")),
+    pub_date =  unlist(purrr::map(resources, "issued")),
     download_url = unlist(purrr::map(resources, "download_url"))
   )
+  
+  # check if votedates and resource-URLs can be parsed 
+  if(is.null(urls$date)) message("Votedates cannot be parsed properly. There might be an issue with the opendata.swiss-metadata API.")
+  
+  if(is.null(urls$download_url)) message("The download URLs cannot be parsed properly. There might be an issue with the opendata.swiss-metadata API.")
+  
   
   # Return
   return(urls)
@@ -169,7 +208,7 @@ plot_map_national <- function(dt, lakes, legend_title, language, theme) {
           measure >= 55 & measure < 60 ~ "55",
           measure >= 60 & measure < 65 ~ "60",
           measure >= 65 ~ "65"
-          ), levels = c("", "35", "40", "45", "50", "55", "60", "65")
+        ), levels = c("", "35", "40", "45", "50", "55", "60", "65")
         )
       )
     
@@ -180,7 +219,7 @@ plot_map_national <- function(dt, lakes, legend_title, language, theme) {
         values = c(
           "#8d0613", "#c91022", "#f1434a", "#ff9193",
           "#91cdff", "#42a2f1", "#1a7bc5", "#105182"
-          ),
+        ),
         drop = F,
         name = legend_title,
         guide = ggplot2::guide_legend(
@@ -214,7 +253,7 @@ plot_map_national <- function(dt, lakes, legend_title, language, theme) {
         plot.caption = ggplot2::element_text(hjust = 0, colour = "#6b6960")
       )
     
-    } else {
+  } else {
     
     p1 <- ggplot2::ggplot(dt) +
       ggplot2::geom_sf(ggplot2::aes(fill = measure), color = "white") +
@@ -228,8 +267,8 @@ plot_map_national <- function(dt, lakes, legend_title, language, theme) {
           title.hjust = 0.5,
           label.hjust = 0.5,
           ticks = FALSE
-          )
-        ) +
+        )
+      ) +
       ggplot2::ggtitle(unique(dt[["name"]])) +
       ggplot2::theme(
         plot.background = ggplot2::element_rect(fill = "white", color = NA),
@@ -241,7 +280,7 @@ plot_map_national <- function(dt, lakes, legend_title, language, theme) {
         legend.position = "bottom"
       )
     
-    }
+  }
   
   # Add lakes
   if (!is.null(lakes)) {
@@ -250,10 +289,10 @@ plot_map_national <- function(dt, lakes, legend_title, language, theme) {
     if (!theme == "srf") p1 <- p1 + ggplot2::geom_sf(data = lakes, fill = "#ceefff", color = "#4889c5")
     
   }
-
+  
   # Display
   p1
-      
+  
 }
 
 #' @importFrom dplyr mutate case_when
@@ -308,7 +347,7 @@ plot_map_cantonal <- function(dt, legend_title, language, theme) {
     language == "FR" ~ unique(dt[["fr"]]),
     language == "IT" ~ unique(dt[["it"]]),
     language == "RM" ~ unique(dt[["rm"]])
-    )
+  )
   
   # Remove NA
   plot_title <- plot_title[!is.na(plot_title)]
@@ -370,7 +409,7 @@ plot_map_cantonal <- function(dt, legend_title, language, theme) {
       ggplot2::labs(
         title = plot_title,
         caption = caption_text
-        ) +
+      ) +
       ggplot2::theme(
         plot.background = ggplot2::element_rect(fill = "#f5f5f2", color = NA),
         legend.background = ggplot2::element_rect(fill = "#f5f5f2", color = NA),
