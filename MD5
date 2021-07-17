@@ -1,9 +1,9 @@
-b6c4ebdf1b77bc96e6f7f7ed042803c6 *DESCRIPTION
+e611b2e7403c7bd220c9547dc51c48cc *DESCRIPTION
 89c9413fe11e113160727d4372acf562 *NAMESPACE
 f8eeedcd99d5715e03b84af653b213a4 *R/available_votedates.R
 a30c35ae4836cbfb867462746d16eed6 *R/canton_json_to_dfr.R
 7d78ee2872f778b505cdeaed9c0f9782 *R/get_cantonalvotes.R
-6169c04eb552fb20eb23dae0f0909fb2 *R/get_geodata.R
+5dfcae3ced5d96a854af82edfef6cb98 *R/get_geodata.R
 509045bbba02da11dfe6bbec14333629 *R/get_nationalvotes.R
 6605b43eadb54dfa5fc36b1d871f84fc *R/get_poll.R
 622d26fc362b3aabc3c36680e8cda752 *R/get_swissvotes.R
